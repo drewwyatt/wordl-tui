@@ -1,7 +1,7 @@
 use std::io::{stdout, Write};
 use termion::input::MouseTerminal;
 use termion::raw::IntoRawMode;
-use termion::{clear, color, cursor, style};
+use termion::{color, cursor, style};
 
 pub struct Writer {
   stdout: termion::input::MouseTerminal<termion::raw::RawTerminal<std::io::Stdout>>,
@@ -85,9 +85,5 @@ impl Writer {
 
   pub fn backspace(&mut self) {
     write!(self.stdout, "{}{}{}", cursor::Left(1), " ", cursor::Left(1));
-  }
-
-  pub fn clear(&mut self) {
-    write!(self.stdout, "{}\r", clear::CurrentLine);
   }
 }

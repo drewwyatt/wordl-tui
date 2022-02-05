@@ -63,18 +63,3 @@ fn main() {
         write.flush();
     }
 }
-
-fn print_guess(write: &mut Writer, guess: &Vec<char>, answer: &Vec<char>) {
-    for (index, letter) in guess.iter().enumerate() {
-        if letter == &answer[index] {
-            write.green_guess(letter);
-        } else if answer.contains(letter) {
-            write.yellow_guess(letter);
-        } else {
-            write.guess(letter);
-        }
-    }
-
-    write.newline();
-    write.flush();
-}
