@@ -28,6 +28,16 @@ fn main() {
                 write.backspace();
             }
             Event::Key(Key::Char(key)) => {
+                // Enter key
+                if key == '\n' {
+                    if letters.len() == 5 {
+                        write.input(&key);
+                        write.flush();
+                        break;
+                    }
+                    continue;
+                }
+
                 if letters.len() < 5 {
                     letters.push(key);
                     if key == 'r' {
