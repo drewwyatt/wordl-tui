@@ -9,7 +9,7 @@ pub struct Writer {
 
 impl Writer {
   pub fn new() -> Self {
-    Writer {
+    Self {
       stdout: MouseTerminal::from(stdout().into_raw_mode().unwrap()),
     }
   }
