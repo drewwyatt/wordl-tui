@@ -1,24 +1,23 @@
-use std::io::{stdin, stdout, Write};
-use termion::event::{Event, Key};
-use termion::input::{MouseTerminal, TermRead};
-use termion::raw::IntoRawMode;
-use termion::{clear, color, style};
+mod lib;
 
-type RawSTDOut = termion::input::MouseTerminal<termion::raw::RawTerminal<std::io::Stdout>>;
+use lib::io::Writer;
+use std::io::stdin;
+use termion::event::{Event, Key};
+use termion::input::TermRead;
 
 fn main() {
     let stdin = stdin();
-    let mut stdout = MouseTerminal::from(stdout().into_raw_mode().unwrap());
     let answer = vec!['q', 'u', 'e', 'r', 'y'];
     let mut letters = vec![];
+    let mut write = Writer::new();
 
-    write!(stdout, "wordl-tui\r\nctrl+c to exit\r\n\n",).unwrap();
-    stdout.flush().unwrap();
+    write.line("wordl-tui");
+    write.line("(ctrl+c to exit)");
+    write.newline();
 
     let last_guess = vec!['d', 'r', 'e', 's', 's'];
-    print_guess(&mut stdout, &last_guess, &answer);
-
-    stdout.flush().unwrap();
+    print_guess(&mut write, &last_guess, &answer);
+    write.flush();
 
     for c in stdin.events() {
         let evt = c.unwrap();
@@ -26,72 +25,37 @@ fn main() {
             Event::Key(Key::Ctrl('c')) => break,
             Event::Key(Key::Backspace) => {
                 letters.pop();
-                write!(stdout, "{}", format_input(&letters));
+                write.backspace();
             }
             Event::Key(Key::Char(key)) => {
-                if letters.len() <= 5 {
+                if letters.len() < 5 {
                     letters.push(key);
                     if key == 'r' {
-                        write!(
-                            stdout,
-                            "{}{}{}{}",
-                            color::Fg(color::Yellow),
-                            style::Underline,
-                            key,
-                            style::Reset
-                        );
+                        write.yellow_input(&key);
                     } else if key == 'e' {
-                        write!(
-                            stdout,
-                            "{}{}{}{}",
-                            color::Fg(color::Green),
-                            style::Underline,
-                            key,
-                            style::Reset
-                        );
+                        write.green_input(&key);
                     } else {
-                        write!(stdout, "{}", key);
+                        write.input(&key);
                     }
                 }
             }
             _ => {}
         }
-        stdout.flush().unwrap();
+        write.flush();
     }
 }
 
-fn format_input(letters: &Vec<char>) -> String {
-    format!(
-        "\r{}{}",
-        clear::CurrentLine,
-        letters.clone().iter().collect::<String>()
-    )
-}
-
-fn print_guess(stdout: &mut RawSTDOut, guess: &Vec<char>, answer: &Vec<char>) {
-    write!(stdout, "\r{}Guess #1:\r\n", style::Bold);
-
+fn print_guess(write: &mut Writer, guess: &Vec<char>, answer: &Vec<char>) {
     for (index, letter) in guess.iter().enumerate() {
         if letter == &answer[index] {
-            write!(
-                stdout,
-                "{}{}{}",
-                color::Bg(color::Green),
-                color::Fg(color::Black),
-                letter
-            );
+            write.green_guess(letter);
         } else if answer.contains(letter) {
-            write!(
-                stdout,
-                "{}{}{}",
-                color::Bg(color::Yellow),
-                color::Fg(color::Black),
-                letter
-            );
+            write.yellow_guess(letter);
         } else {
-            write!(stdout, "{}{}", style::Reset, letter);
+            write.guess(letter);
         }
     }
 
-    write!(stdout, "{}\r\n", style::Reset);
+    write.newline();
+    write.flush();
 }
