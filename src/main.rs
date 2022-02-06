@@ -11,7 +11,7 @@ fn main() {
     let mut game = Game::new("query");
     let mut write = Writer::new();
 
-    write.line("wordl-tui");
+    write.line("wordle-tui");
     write.line("(ctrl+c to exit)");
     write.newline();
 

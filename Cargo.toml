@@ -1,5 +1,5 @@
 [package]
-name = "wordl-tui"
+name = "wordle-tui"
 version = "0.1.0"
 edition = "2021"
 
